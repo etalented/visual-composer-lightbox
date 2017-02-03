@@ -1,0 +1,4 @@
+*** Visual Composer Lightbox Enhancement Changelog ***
+
+2017.02.03 - version 1.0.0
+ * Initial release
