@@ -112,8 +112,81 @@ class Visual_Composer_Lightbox {
 		// Handle localisation
 		$this->load_plugin_textdomain();
         
+        add_action( 'plugins_loaded', array( $this, 'plugins_loaded' ), 10 );
+        
 		add_action( 'init', array( $this, 'load_localisation' ), 0 );
 	} // End __construct ()
+    
+    public function get_settings () {
+        error_log('get_settings');
+        return $this->settings;
+    }
+    
+	/**
+	 * Run after all plugins are loaded.
+	 * @access  public
+	 * @since   1.0.0
+	 * @return void
+	 */
+	public function plugins_loaded () {
+        add_filter( 'vc_gitem_add_link_param', array( $this, 'vc_gitem_add_link_param' ) );
+        
+		add_filter( 'vc_gitem_zone_image_block_link', array( $this, 'vc_gitem_zone_image_block_link'), 10, 3 );
+        
+		add_filter( 'vc_gitem_post_data_get_link_link', array( $this, 'vc_gitem_post_data_get_link_link'), 10, 3 );
+	} // End plugins_loaded ()
+    
+	/**
+	 * Modify the vc-zone-link anchor for lightbox links.
+	 * @access  public
+	 * @since   1.0.0
+	 * @return $param
+	 */
+	public function vc_gitem_zone_image_block_link ( $image_block, $link, $css_class ) {
+        error_log('vc_gitem_zone_image_block_link');
+        if ( 'lightbox' === $link ) {
+            $link_attribute_value = get_option($this->settings->base . 'link_attribute_value');
+            
+            // Append link_attribute_value to existing classes
+            $css_class .= ' ' . $link_attribute_value;
+
+            return '<a href="{{ post_link_url }}" class="' . esc_attr( $css_class ) . '" data-rel="' . $link_attribute_value . '"' . '></a>';
+        }
+
+        return $image_block;
+    }// End vc_gitem_zone_image_block_link ()
+    
+	/**
+	 * Modify the post_title anchor for lightbox links.
+	 * @access  public
+	 * @since   1.0.0
+	 * @return $link
+	 */
+	public function vc_gitem_post_data_get_link_link ( $link, $atts, $css_class = '' ) {
+        error_log('vc_gitem_post_data_get_link_link');
+        if ( isset( $atts['link'] ) && 'lightbox' === $atts['link'] ) {
+            $link_attribute_value = get_option($this->settings->base . 'link_attribute_value');
+            
+            // Append link_attribute_value to existing classes
+            $css_class .= ' ' . $link_attribute_value;
+
+            $link = 'a href="{{ post_link_url }}" class="' . esc_attr( $css_class ) . '" data-rel="' . $link_attribute_value . '"';
+        }
+        
+        return $link;
+    } // End vc_gitem_post_data_get_link_link ()
+    
+	/**
+	 * Append a Lightbox option to the Visual Composer Add link select.
+	 * @access  public
+	 * @since   1.0.0
+	 * @return $param
+	 */
+	public function vc_gitem_add_link_param ( $param ) {
+        $param['value'][ __( 'Lightbox', 'js_composer' ) ] = 'lightbox';
+
+        return $param;
+	} // End vc_gitem_add_link_param ()
 
 	/**
 	 * Load frontend CSS.

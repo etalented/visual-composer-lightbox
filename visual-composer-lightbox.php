@@ -34,7 +34,7 @@ require_once( 'includes/lib/class-visual-composer-lightbox-admin-api.php' );
  */
 function Visual_Composer_Lightbox () {
 	$instance = Visual_Composer_Lightbox::instance( __FILE__, '1.0.0' );
-
+    
 	if ( is_null( $instance->settings ) ) {
 		$instance->settings = Visual_Composer_Lightbox_Settings::instance( $instance );
 	}
